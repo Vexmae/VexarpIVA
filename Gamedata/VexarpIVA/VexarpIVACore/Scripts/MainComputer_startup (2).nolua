@@ -1,0 +1,36 @@
+function MAS_VEXARP_MainComp() -- Function for a button to toggle the iva ( like MainBus or Battery switches )
+
+	-- Is it time to start?
+	if fc.GetPersistentAsNumber("MAS_VEXARP_Event_Trigger_Time") > fc.UT() then
+
+		if fc.GetPersistentAsNumber("MAS_VEXARP_MainComp_State") < 1 then -- if the main computer is off
+			if fc.GetPersistentAsNumber("MAS_VEXARP_MainComp_Button") > 0 then -- If the button is still pressed
+				fc.TogglePersistent("MAS_VEXARP_MainComp_State") -- turn the main computer ON
+				fc.PlayAudio( "VexarpIVA/VexarpIVACore/Sounds/Startup/goodbip", 1, true) -- Play a beep sound (like on a computer) // First Sound
+			else -- if the button is not pressed
+				fc.PlayAudio( "VexarpIVA/VexarpIVACore/Sounds/Startup/badbip+fanstop", 1, true) -- Play an error sound and don't turn on the computer // Second Sound
+			end
+		else -- if the main computer is on
+			if fc.GetPersistentAsNumber("MAS_VEXARP_MainComp_Button") > 0 then -- if the button is still pressed
+				fc.TogglePersistent("MAS_VEXARP_MainComp_State") -- Turn the main computer off
+				fc.PlayAudio( "VexarpIVA/VexarpIVACore/Sounds/Startup/warning+fanstop", 1, true) -- Play a computer stopping sound // Third Sound
+			else -- if the button is not pressed
+				fc.PlayAudio( "VexarpIVA/VexarpIVACore/Sounds/Startup/badbip", 1, true) -- play an error sound and don't turn off the computer // Fourth Sound
+			end
+		end
+		
+		-- Reset timer, so the player has to press the button again to switch computer off or on.
+		fc.SetPersistent("MAS_VEXARP_Event_Trigger_Time", 0)
+		
+	end	-- end 'is it time to start'
+
+end -- end MAS_VEXARP_MainComp()
+
+function MAS_VEXARP_WAIT() --This is the Wait script
+		fc.SetPersistent("MAS_VEXARP_Event_Trigger_Time", fc.UT() + 5)
+		if fc.GetPersistentAsNumber("MAS_VEXARP_MainComp_State") < 1 then
+			fc.PlayAudio( "VexarpIVA/VexarpIVACore/Sounds/Startup/starthdd", 1, false) 
+		end
+end
+
+-- All sounds are in the .wav file format 
